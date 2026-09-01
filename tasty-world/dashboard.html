@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TasteWorld - My Profile</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;600;700&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* ---- Dashboard Extra Styles ---- */
+    .dash-banner {
+      background: linear-gradient(135deg, var(--primary-500), var(--orange-500));
+      padding: 2rem 1rem 4.5rem;
+      color: white;
+      text-align: center;
+      position: relative;
+    }
+    .dash-banner::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0; right: 0;
+      height: 40px;
+      background: var(--bg-color);
+      border-radius: 40px 40px 0 0;
+    }
+    .profile-avatar-wrapper {
+      position: relative;
+      display: inline-block;
+      margin-bottom: 0.75rem;
+    }
+    .profile-avatar {
+      width: 96px; height: 96px;
+      border-radius: 50%;
+      border: 4px solid rgba(255,255,255,0.6);
+      object-fit: cover;
+      display: block;
+      background: rgba(255,255,255,0.15);
+    }
+    .avatar-edit-btn {
+      position: absolute;
+      bottom: 2px; right: 2px;
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: white;
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      transition: transform 0.2s;
+    }
+    .avatar-edit-btn:hover { transform: scale(1.15); }
+    .avatar-edit-btn svg { width: 14px; height: 14px; color: var(--primary-500); }
+    .profile-name { font-size: 1.4rem; font-weight: 800; }
+    .profile-sub  { opacity: 0.85; font-size: 0.85rem; margin-top: 0.1rem; }
+
+    /* Stats row */
+    .dash-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+      padding: 0 1rem;
+      margin: -2rem auto 1.5rem;
+      max-width: 560px;
+      position: relative; z-index: 2;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 1rem;
+      padding: 0.85rem 0.5rem;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+    }
+    .stat-value { font-size: 1.4rem; font-weight: 800; color: var(--primary-500); }
+    .stat-label { font-size: 0.68rem; color: var(--text-gray); margin-top: 0.15rem; }
+
+    /* Sections */
+    .dash-section {
+      padding: 0 1rem;
+      margin-bottom: 1.75rem;
+      max-width: 560px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .section-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-gray);
+      margin-bottom: 0.6rem;
+      padding-left: 0.25rem;
+    }
+
+    /* Row items */
+    .setting-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.9rem 1rem;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .setting-row:first-of-type { border-radius: 1rem 1rem 0 0; }
+    .setting-row:last-of-type  { border-radius: 0 0 1rem 1rem; }
+    .setting-row:only-of-type  { border-radius: 1rem; }
+    .setting-row + .setting-row { border-top: none; }
+    .setting-row:hover { background: var(--input-bg); }
+    .setting-label {
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.95rem;
+    }
+    .setting-label .icon-wrap {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .icon-red    { background:#fee2e2; color:#dc2626; }
+    .icon-blue   { background:#dbeafe; color:#2563eb; }
+    .icon-green  { background:#dcfce7; color:#16a34a; }
+    .icon-purple { background:#f3e8ff; color:#9333ea; }
+    .icon-orange { background:#ffedd5; color:#ea580c; }
+    .icon-teal   { background:#ccfbf1; color:#0d9488; }
+    .icon-pink   { background:#fce7f3; color:#db2777; }
+    .icon-yellow { background:#fef9c3; color:#ca8a04; }
+    .icon-gray   { background:#f1f5f9; color:#64748b; }
+    [data-theme='dark'] .icon-red    { background:rgba(220,38,38,0.2); }
+    [data-theme='dark'] .icon-blue   { background:rgba(37,99,235,0.2); }
+    [data-theme='dark'] .icon-green  { background:rgba(22,163,74,0.2); }
+    [data-theme='dark'] .icon-purple { background:rgba(147,51,234,0.2); }
+    [data-theme='dark'] .icon-orange { background:rgba(234,88,12,0.2); }
+    [data-theme='dark'] .icon-teal   { background:rgba(13,148,136,0.2); }
+    [data-theme='dark'] .icon-pink   { background:rgba(219,39,119,0.2); }
+    [data-theme='dark'] .icon-yellow { background:rgba(202,138,4,0.2); }
+    [data-theme='dark'] .icon-gray   { background:rgba(100,116,139,0.2); }
+
+    .setting-right { display:flex; align-items:center; gap:0.5rem; color:var(--text-gray); font-size:0.9rem; }
+    .chevron { opacity: 0.5; }
+
+    /* Badge */
+    .badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+    }
+    .badge-new { background: var(--primary-500); color: white; }
+
+    /* Toggle */
+    .toggle { position:relative; width:44px; height:24px; flex-shrink:0; }
+    .toggle input { opacity:0; width:0; height:0; }
+    .toggle-slider {
+      position:absolute; inset:0;
+      background:var(--input-border);
+      border-radius:999px; cursor:pointer; transition:0.3s;
+    }
+    .toggle-slider::before {
+      content:'';
+      position:absolute;
+      width:18px; height:18px;
+      left:3px; bottom:3px;
+      background:white;
+      border-radius:50%; transition:0.3s;
+    }
+    .toggle input:checked + .toggle-slider { background:var(--primary-500); }
+    .toggle input:checked + .toggle-slider::before { transform:translateX(20px); }
+
+    /* Recently Viewed mini cards */
+    .recent-scroll {
+      display: flex;
+      gap: 0.75rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+      scrollbar-width: none;
+    }
+    .recent-scroll::-webkit-scrollbar { display:none; }
+    .recent-card {
+      flex-shrink: 0;
+      width: 120px;
+      border-radius: 0.85rem;
+      overflow: hidden;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .recent-card:hover { transform: translateY(-3px); }
+    .recent-card img {
+      width:100%; height:80px; object-fit:cover; display:block;
+    }
+    .recent-card-title {
+      font-size:0.72rem; font-weight:600;
+      padding:0.4rem 0.5rem;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .recent-empty {
+      color: var(--text-gray);
+      font-size: 0.875rem;
+      padding: 1rem;
+      text-align: center;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 1rem;
+    }
+
+    /* Diet chip selector */
+    .chip-group { display:flex; gap:0.5rem; flex-wrap:wrap; }
+    .diet-chip {
+      padding: 0.4rem 1rem;
+      border-radius: 999px;
+      border: 1.5px solid var(--card-border);
+      background: var(--card-bg);
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .diet-chip.active {
+      background: var(--primary-500);
+      border-color: var(--primary-500);
+      color: white;
+    }
+
+    /* Modals */
+    .modal-overlay {
+      position:fixed; inset:0;
+      background:rgba(0,0,0,0.55);
+      backdrop-filter:blur(4px);
+      z-index:999;
+      display:flex; align-items:flex-end; justify-content:center;
+      padding: 0;
+    }
+    .modal-sheet {
+      background: var(--card-bg);
+      border-radius: 1.5rem 1.5rem 0 0;
+      padding: 1.5rem 1.5rem 2.5rem;
+      width: 100%;
+      max-width: 560px;
+      animation: slideUp 0.3s ease;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal-handle {
+      width: 36px; height: 4px;
+      background: var(--input-border);
+      border-radius: 2px;
+      margin: 0 auto 1.25rem;
+    }
+    .modal-sheet h3 { margin-bottom: 1.25rem; font-size: 1.1rem; }
+    .avatar-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+    .avatar-option {
+      width: 100%; aspect-ratio:1;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      cursor: pointer;
+      object-fit: cover;
+      transition: 0.2s;
+      background: var(--input-bg);
+    }
+    .avatar-option:hover, .avatar-option.selected {
+      border-color: var(--primary-500);
+      transform: scale(1.08);
+    }
+    .btn-row { display:flex; gap:0.75rem; margin-top:1rem; }
+    .btn-row .btn { flex:1; }
+
+    /* Notification toast */
+    .toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%; transform: translateX(-50%);
+      background: #1e293b;
+      color: white;
+      padding: 0.65rem 1.25rem;
+      border-radius: 999px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      z-index: 9999;
+      animation: toastIn 0.3s ease, toastOut 0.3s ease 2s forwards;
+      white-space: nowrap;
+    }
+    @keyframes toastIn  { from{opacity:0;transform:translateX(-50%) translateY(10px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+    @keyframes toastOut { from{opacity:1} to{opacity:0} }
+
+    /* Streak flame */
+    .streak-display {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, #ff6b35, #f7c59f);
+      color: white;
+      padding: 0.75rem 1rem;
+      border-radius: 1rem;
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+    }
+    .streak-flame { font-size: 1.5rem; }
+
+    /* App info */
+    .app-info-box {
+      background: linear-gradient(135deg, var(--primary-500)08, var(--orange-500)0a);
+      border: 1px solid var(--card-border);
+      border-radius: 1rem;
+      padding: 1rem;
+      text-align: center;
+    }
+    .app-logo-text {
+      font-size: 1.25rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--primary-500), var(--orange-500));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .app-version { font-size: 0.8rem; color: var(--text-gray); margin-top: 0.25rem; }
+  </style>
+</head>
+<body>
+<div class="dashboard-wrapper" style="padding-bottom:90px;">
+
+  <!-- Header Banner -->
+  <div class="dash-banner">
+    <div class="profile-avatar-wrapper">
+      <img id="profile-avatar" class="profile-avatar" src="" alt="Profile">
+      <button class="avatar-edit-btn" onclick="openAvatarModal()" title="Edit Photo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </button>
+    </div>
+    <div class="profile-name" id="profile-name">Guest Chef</div>
+    <div class="profile-sub" id="profile-sub">🌍 Exploring world cuisines</div>
+  </div>
+
+  <!-- Stats -->
+  <div class="dash-stats">
+    <div class="stat-card">
+      <div class="stat-value" id="stat-saved">0</div>
+      <div class="stat-label">❤️ Saved</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-cooked">0</div>
+      <div class="stat-label">👨‍🍳 Cooked</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-streak">0</div>
+      <div class="stat-label">🔥 Streak</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-shared">0</div>
+      <div class="stat-label">🔗 Shared</div>
+    </div>
+  </div>
+
+  <!-- Recently Viewed -->
+  <div class="dash-section">
+    <div class="section-title">Recently Viewed</div>
+    <div id="recent-recipes" class="recent-scroll">
+      <div class="recent-empty">No recipes viewed yet. <a href="gallery.html" style="color:var(--primary-500);">Explore now →</a></div>
+    </div>
+  </div>
+
+  <!-- Dietary Preference -->
+  <div class="dash-section">
+    <div class="section-title">Dietary Preference</div>
+    <div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:1rem;padding:1rem;">
+      <div class="chip-group" id="diet-chips">
+        <div class="diet-chip active" data-diet="all" onclick="selectDiet(this)">🍽️ All</div>
+        <div class="diet-chip" data-diet="veg" onclick="selectDiet(this)">🌿 Vegetarian</div>
+        <div class="diet-chip" data-diet="non-veg" onclick="selectDiet(this)">🍗 Non-Veg</div>
+        <div class="diet-chip" data-diet="vegan" onclick="selectDiet(this)">🥦 Vegan</div>
+        <div class="diet-chip" data-diet="gluten-free" onclick="selectDiet(this)">🌾 Gluten-Free</div>
+        <div class="diet-chip" data-diet="high-protein" onclick="selectDiet(this)">💪 Protein</div>
+        <div class="diet-chip" data-diet="high-calorie" onclick="selectDiet(this)">🍳 Weight Gain</div>
+        <div class="diet-chip" data-diet="weight-loss"  onclick="selectDiet(this)">🥗 Weight Loss</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Climate Suggestion -->
+  <div class="dash-section">
+    <div class="section-title" style="display:flex;justify-content:space-between;align-items:center;">
+      Climate Preference ⛅
+      <label class="switch">
+        <input type="checkbox" id="climate-toggle" onchange="toggleClimateMode(this.checked)">
+        <span class="slider round"></span>
+      </label>
+    </div>
+    <div id="climate-options" style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:1rem;padding:1rem;transition:all 0.3s ease;">
+      <div class="chip-group" id="climate-chips">
+        <div class="diet-chip active" data-climate="summer"  onclick="selectClimateDash(this)">☀️ Summer</div>
+        <div class="diet-chip"        data-climate="winter"  onclick="selectClimateDash(this)">❄️ Winter</div>
+        <div class="diet-chip"        data-climate="monsoon" onclick="selectClimateDash(this)">🌧️ Monsoon</div>
+      </div>
+      <p style="font-size:0.75rem;color:var(--text-gray);margin-top:0.75rem;">Suggesting foods suitable for your current weather.</p>
+    </div>
+  </div>
+
+  <!-- Budget Idea -->
+  <div class="dash-section">
+    <div class="section-title">Budget Preference 💰</div>
+    <div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:1rem;padding:1rem;">
+      <div class="chip-group" id="budget-chips">
+        <div class="diet-chip active" data-budget="all"      onclick="selectBudgetDash(this)">🔓 All</div>
+        <div class="diet-chip"        data-budget="low"      onclick="selectBudgetDash(this)">💰 Budget</div>
+        <div class="diet-chip"        data-budget="medium"   onclick="selectBudgetDash(this)">💵 Moderate</div>
+        <div class="diet-chip"        data-budget="high"     onclick="selectBudgetDash(this)">💳 Premium</div>
+      </div>
+      <p style="font-size:0.75rem;color:var(--text-gray);margin-top:0.75rem;">Filtering recipes based on estimated ingredient costs.</p>
+    </div>
+  </div>
+
+  <!-- MEDICINAL MODE -->
+  <div class="dash-section">
+    <div class="section-title" style="display:flex;justify-content:space-between;align-items:center;">
+      Medicinal Mode 🏥
+      <label class="switch">
+        <input type="checkbox" id="medicinal-toggle" onchange="toggleMedicinalMode(this.checked)">
+        <span class="slider round"></span>
+      </label>
+    </div>
+    <div id="medicinal-options" style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:1rem;padding:1rem;opacity:0.5;pointer-events:none;transition:all 0.3s ease;">
+      <p style="font-size:0.8rem;margin-bottom:1rem;color:var(--text-gray);">Select your current health condition for customized recommendations.</p>
+      <div class="chip-group" id="medicinal-chips">
+        <div class="diet-chip active" data-condition="fever" onclick="selectCondition(this)">🌡️ Fever</div>
+        <div class="diet-chip" data-condition="cold" onclick="selectCondition(this)">🤧 Cold</div>
+        <div class="diet-chip" data-condition="low-blood" onclick="selectCondition(this)">🩸 Low Blood</div>
+        <div class="diet-chip" data-condition="bp" onclick="selectCondition(this)">💓 BP</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Settings -->
+  <div class="dash-section">
+    <div class="section-title">Profile</div>
+
+    <div class="setting-row" onclick="openEditNameModal()">
+      <span class="setting-label">
+        <span class="icon-wrap icon-blue">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </span>
+        Display Name
+      </span>
+      <span class="setting-right">
+        <span id="setting-name">Guest Chef</span>
+        <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </span>
+    </div>
+
+    <div class="setting-row" onclick="shareApp()">
+      <span class="setting-label">
+        <span class="icon-wrap icon-green">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+        </span>
+        Share TasteWorld Link
+      </span>
+      <span class="setting-right">
+        <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </span>
+    </div>
+
+    <div class="setting-row" onclick="openBioModal()">
+      <span class="setting-label">
+        <span class="icon-wrap icon-purple">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </span>
+        Bio / Tagline
+      </span>
+      <span class="setting-right">
+        <span id="setting-bio" style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Add a bio...</span>
+        <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </span>
+    </div>
+
+    <div class="setting-row">
+      <span class="setting-label">
+        <span class="icon-wrap icon-orange">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </span>
+        Age Group
+      </span>
+      <span class="setting-right">
+        <span id="setting-age">—</span>
+        <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </span>
+    </div>
+  </div>
+
+  <!-- Preferences -->
+  <div class="dash-section">
+    <div class="section-title">Preferences</div>
+
+    <div class="setting-row">
+      <span class="setting-label">
+        <span class="icon-wrap icon-gray">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2z"/></svg>
+        </span>
+        Language
+      </span>
+      <select class="form-control" id="dash-lang" style="width:auto;padding:0.35rem 0.7rem;font-size:0.85rem;border-radius:0.5rem;" onchange="changeDashLang(this.value)">
+        <option value="en">English</option>
+        <option value="ta">தமிழ் (Tamil)</option>
+        <option value="hi">हिंदी (Hindi)</option>
+        <option value="te">తెలుగు (Telugu)</option>
+        <option value="ml">മലയാളം (Malayalam)</option>
+        <option value="kn">ಕನ್ನಡ (Kannada)</option>
+        <option value="mr">मराठी (Marathi)</option>
+        <option value="es">Español (Spanish)</option>
+        <option value="fr">Français (French)</option>
+        <option value="de">Deutsch (German)</option>
+        <option value="ja">日本語 (Japanese)</option>
+        <option value="zh">中文 (Chinese)</option>
+        <option value="ru">Русский (Russian)</option>
+        <option value="ar">العربية (Arabic)</option>
+        <option value="pt">Português (Portuguese)</option>
+        <option value="it">Italiano (Italian)</option>
+      </select>
+    </div>
+
+    <div class="setting-row">
+      <span class="setting-label">
+        <span class="icon-wrap icon-yellow">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        </span>
+        Dark Mode
+      </span>
+      <label class="toggle">
+        <input type="checkbox" id="dark-toggle" onchange="toggleThemeDash()">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    <div class="setting-row">
+      <span class="setting-label">
+        <span class="icon-wrap icon-teal">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        </span>
+        Notifications
+      </span>
+      <label class="toggle">
+        <input type="checkbox" id="notif-toggle" onchange="saveNotifPref()">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    <div class="setting-row">
+      <span class="setting-label">
+        <span class="icon-wrap icon-green">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </span>
+        Smart Suggestions
+        <span class="badge badge-new">AI</span>
+      </span>
+      <label class="toggle">
+        <input type="checkbox" id="suggest-toggle" checked onchange="saveSuggestPref()">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="dash-section">
+    <div class="section-title">Quick Actions</div>
+
+    <div class="setting-row" onclick="window.location.href='gallery.html'">
+      <span class="setting-label">
+        <span class="icon-wrap icon-red">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        </span>
+        Browse All Recipes
+      </span>
+      <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
+
+    <div class="setting-row" onclick="window.location.href='favourites.html'">
+      <span class="setting-label">
+        <span class="icon-wrap icon-pink">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </span>
+        My Favourite Recipes
+      </span>
+      <span class="setting-right">
+        <span id="fav-count-label" style="font-size:0.8rem;"></span>
+        <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </span>
+    </div>
+
+    <div class="setting-row" onclick="markCookedToday()">
+      <span class="setting-label">
+        <span class="icon-wrap icon-orange">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+        </span>
+        Mark Cooked Today 🍳
+      </span>
+      <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
+
+    <div class="setting-row" onclick="shareApp()">
+      <span class="setting-label">
+        <span class="icon-wrap icon-blue">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        </span>
+        Share TasteWorld
+      </span>
+      <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
+  </div>
+
+  <!-- Support -->
+  <div class="dash-section">
+    <div class="section-title">Support</div>
+
+    <div class="setting-row" onclick="showFeedbackModal()">
+      <span class="setting-label">
+        <span class="icon-wrap icon-yellow">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </span>
+        Rate &amp; Feedback
+      </span>
+      <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
+
+    <div class="setting-row" onclick="showAbout()">
+      <span class="setting-label">
+        <span class="icon-wrap icon-gray">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </span>
+        About TasteWorld
+      </span>
+      <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
+
+    <div class="setting-row" onclick="resetOnboarding()">
+      <span class="setting-label" style="color:#dc2626;">
+        <span class="icon-wrap icon-red">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </span>
+        Logout / Reset Data
+      </span>
+      <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
+  </div>
+
+  <!-- App Info -->
+  <div class="dash-section">
+    <div class="app-info-box">
+      <div class="app-logo-text" style="display:flex;align-items:center;justify-content:center;gap:0.5rem;"><img src="img/logo.png" alt="Logo" class="logo-img"> TasteWorld</div>
+      <div class="app-version">Version 2.0 · Made with ❤️ for food lovers</div>
+    </div>
+  </div>
+
+</div><!-- end dashboard-wrapper -->
+
+<!-- ======================== MODALS ======================== -->
+
+<!-- Avatar Modal -->
+<div class="modal-overlay hidden" id="avatar-modal" onclick="closeOnOverlay(event,'avatar-modal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <h3>📸 Choose Your Avatar</h3>
+    <div class="avatar-grid" id="avatar-options"></div>
+    <div class="form-group">
+      <label style="font-size:0.85rem;font-weight:600;color:var(--text-gray);margin-bottom:0.4rem;display:block;">Or upload from your device</label>
+      <input type="file" accept="image/*" class="form-control" id="avatar-upload" onchange="handleAvatarUpload(event)">
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-outline btn-sm" onclick="closeModal('avatar-modal')">Cancel</button>
+      <button class="btn btn-primary btn-sm" style="margin-top:0;" onclick="saveAvatar()">Save Photo</button>
+    </div>
+  </div>
+</div>
+
+<!-- Name Modal -->
+<div class="modal-overlay hidden" id="name-modal" onclick="closeOnOverlay(event,'name-modal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <h3>✏️ Edit Display Name</h3>
+    <div class="form-group">
+      <label>Your Name</label>
+      <input type="text" class="form-control" id="edit-name-input" placeholder="E.g. Priya Sharma" maxlength="30">
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-outline btn-sm" onclick="closeModal('name-modal')">Cancel</button>
+      <button class="btn btn-primary btn-sm" style="margin-top:0;" onclick="saveName()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bio Modal -->
+<div class="modal-overlay hidden" id="bio-modal" onclick="closeOnOverlay(event,'bio-modal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <h3>📝 Edit Bio / Tagline</h3>
+    <div class="form-group">
+      <label>Your tagline (shown on profile)</label>
+      <input type="text" class="form-control" id="edit-bio-input" placeholder="E.g. 🌶️ Spice lover from Chennai" maxlength="60">
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-outline btn-sm" onclick="closeModal('bio-modal')">Cancel</button>
+      <button class="btn btn-primary btn-sm" style="margin-top:0;" onclick="saveBio()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Feedback Modal -->
+<div class="modal-overlay hidden" id="feedback-modal" onclick="closeOnOverlay(event,'feedback-modal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <h3>⭐ Rate TasteWorld</h3>
+    <div style="text-align:center;margin-bottom:1.25rem;">
+      <div id="star-rating" style="font-size:2rem;letter-spacing:0.25rem;">
+        <span class="star" data-val="1" onclick="rateStar(1)">☆</span>
+        <span class="star" data-val="2" onclick="rateStar(2)">☆</span>
+        <span class="star" data-val="3" onclick="rateStar(3)">☆</span>
+        <span class="star" data-val="4" onclick="rateStar(4)">☆</span>
+        <span class="star" data-val="5" onclick="rateStar(5)">☆</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Your feedback (optional)</label>
+      <textarea class="form-control" id="feedback-text" rows="3" placeholder="Tell us what you love or what can improve..."></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-outline btn-sm" onclick="closeModal('feedback-modal')">Skip</button>
+      <button class="btn btn-primary btn-sm" style="margin-top:0;" onclick="submitFeedback()">Submit ✈️</button>
+    </div>
+  </div>
+</div>
+
+<!-- About Modal -->
+<div class="modal-overlay hidden" id="about-modal" onclick="closeOnOverlay(event,'about-modal')">
+  <div class="modal-sheet" style="text-align:center;">
+    <div class="modal-handle"></div>
+    <img src="img/logo.png" alt="TasteWorld Logo" class="logo-img logo-img-lg" style="margin:0 auto 0.75rem;display:block;">
+    <div style="font-size:1.5rem;font-weight:800;background:linear-gradient(135deg,var(--primary-500),var(--orange-500));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">TasteWorld</div>
+    <div style="color:var(--text-gray);font-size:0.85rem;margin:0.25rem 0 1.25rem;">Version 2.0 · Pure Vanilla Web App</div>
+    <p style="font-size:0.9rem;line-height:1.7;color:var(--text-gray);margin-bottom:1rem;">
+      TasteWorld is your mobile-first recipe companion featuring 50+ global recipes with step-by-step cooking guides, video tutorials, multi-language support (English &amp; Tamil), and smart diet filtering — all running offline in your browser.
+    </p>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:center;margin-bottom:1.25rem;">
+      <span style="background:var(--input-bg);padding:0.3rem 0.75rem;border-radius:999px;font-size:0.78rem;">🌿 50+ Recipes</span>
+      <span style="background:var(--input-bg);padding:0.3rem 0.75rem;border-radius:999px;font-size:0.78rem;">🌐 Multi-language</span>
+      <span style="background:var(--input-bg);padding:0.3rem 0.75rem;border-radius:999px;font-size:0.78rem;">🔊 Voice Narration</span>
+      <span style="background:var(--input-bg);padding:0.3rem 0.75rem;border-radius:999px;font-size:0.78rem;">📱 Mobile-first</span>
+    </div>
+    <button class="btn btn-primary" style="max-width:200px;margin:0 auto;" onclick="closeModal('about-modal')">Close</button>
+  </div>
+</div>
+
+<!-- Bottom Nav -->
+<nav class="bottom-nav">
+  <a href="gallery.html" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    Home
+  </a>
+  <a onclick="window.globalVoice.toggle()" class="nav-item" id="nav-voice-btn" style="cursor:pointer;" title="Tap to speak">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
+    Voice
+  </a>
+  <a href="favourites.html" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    Favourites
+  </a>
+  <a href="dashboard.html" class="nav-item active">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Profile
+  </a>
+</nav>
+
+<script src="js/i18n.js"></script>
+<script src="js/data.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/voice.js"></script>
+</body>
+</html>

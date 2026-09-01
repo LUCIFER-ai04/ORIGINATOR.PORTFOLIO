@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TasteWorld - Recipe</title>
+  <meta name="description" content="Step-by-step recipe guide with ingredients, video, and nutrition info.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;600;700&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Load dashboard.js in head so applyTheme() runs before first paint — no flash -->
+  <script src="js/dashboard.js"></script>
+
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Hero Image Banner -->
+  <div class="recipe-hero" id="r-header">
+    <div class="hero-topbar">
+      <button class="hero-btn" onclick="history.back()" title="Back" aria-label="Go back">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+        </svg>
+      </button>
+      <button class="hero-btn" id="fav-btn" onclick="handleFavToggle()" title="Save to Favourites" aria-label="Favourite">🤍</button>
+    </div>
+    <div class="hero-content">
+      <h1 id="r-title">Loading…</h1>
+      <div class="meta-chips" id="r-meta"></div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="recipe-body">
+
+    <!-- LEFT: Video + Steps -->
+    <div class="left-col">
+
+      <div class="panel">
+        <div class="panel-title">🎬 Video Guide</div>
+        <div id="video-container"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">👨‍🍳 Cooking Steps</div>
+        <!-- Voice narration controls -->
+        <div class="tts-bar">
+          <button class="btn btn-primary" onclick="startLiveCooking()" style="background: linear-gradient(135deg, var(--primary-500), var(--orange-500)); border: none;">🔥 Live Cook</button>
+          <button class="btn btn-google" onclick="playNarration()" title="Read aloud">🔊</button>
+          <button class="btn btn-google" onclick="pauseNarration()" title="Pause">⏸</button>
+          <button class="btn btn-google" onclick="stopNarration()" title="Stop">⏹</button>
+        </div>
+        <div id="voice-assistant-status" style="font-size: 0.85rem; color: var(--primary-500); font-weight: 600; text-align: center; margin-bottom: 0.75rem; display: none;">Listening...</div>
+        <ol class="steps-list" id="r-steps"></ol>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: Ingredients + Nutrition + Tip -->
+    <div class="right-col">
+
+      <div class="panel">
+        <div class="servings-row">
+          <span style="font-weight:700;font-size:0.95rem;">🧂 Ingredients</span>
+          <div class="servings-ctrl">
+            <button class="srv-btn" onclick="updateServings(-1)" aria-label="Decrease servings">−</button>
+            <span class="srv-num" id="r-servings">1</span>
+            <button class="srv-btn" onclick="updateServings(1)"  aria-label="Increase servings">+</button>
+          </div>
+        </div>
+        <ul class="ing-list" id="r-ingredients"></ul>
+      </div>
+
+      <div class="panel" style="background:var(--primary-50); border-color:var(--primary-200);">
+        <div class="panel-title" style="color:var(--primary-600); display:flex; justify-content:space-between; align-items:center;">
+          Budget Idea 💰
+        </div>
+        <div id="r-budget-breakdown"></div>
+        <div style="margin-top:0.75rem; padding-top:0.75rem; border-top:1px dashed var(--card-border); display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-weight:700;">Total Estimate</span>
+          <span id="r-total-price" style="font-size:1.25rem; font-weight:800; color:var(--primary-500);">$0.00</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">📊 Nutrition Facts</div>
+        <div style="font-size:0.75rem;color:var(--text-gray);margin-bottom:0.65rem;">Per serving · adjusts with servings above</div>
+        <div id="r-nutrition"></div>
+      </div>
+
+      <div class="panel" style="background:linear-gradient(135deg,rgba(239,68,68,0.05),rgba(249,115,22,0.05));border-color:rgba(239,68,68,0.2);">
+        <div class="panel-title" style="color:var(--primary-500);">💡 Chef's Tip</div>
+        <p id="r-tip" style="font-size:0.875rem;color:var(--text-gray);line-height:1.7;"></p>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <a href="gallery.html" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      Home
+    </a>
+    <a onclick="window.globalVoice.toggle()" class="nav-item" id="nav-voice-btn" style="cursor:pointer;" title="Tap to speak">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/>
+      </svg>
+      Voice
+    </a>
+    <a href="favourites.html" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+      </svg>
+      Saved
+    </a>
+    <a href="dashboard.html" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+      </svg>
+      Profile
+    </a>
+  </nav>
+
+  <!-- Live Cooking Mode Overlay -->
+  <div id="live-cooking-mode" class="hidden">
+    <video id="ar-video" autoplay playsinline muted></video>
+    <div id="ar-overlays"></div>
+    
+    <div class="lcm-header">
+      <button class="lcm-exit" onclick="exitLiveCooking()" title="Exit">✖</button>
+      <div class="lcm-title" id="lcm-title">Recipe Name</div>
+      <div class="lcm-progress-text" id="lcm-progress-text">Step 1/5</div>
+    </div>
+    <div class="lcm-progress-bar"><div class="lcm-progress-fill" id="lcm-progress-fill"></div></div>
+    
+    <div class="lcm-content">
+      <div class="lcm-image-wrapper">
+        <img src="" id="lcm-image" alt="Recipe Step">
+      </div>
+      <div class="lcm-step-container">
+        <h2 id="lcm-step-text">Cooking step instruction goes here.</h2>
+        <div id="lcm-timer-container" class="hidden">
+           <div class="lcm-timer-circle">
+             <svg width="120" height="120">
+               <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="8" />
+               <circle cx="60" cy="60" r="54" fill="none" stroke="var(--primary-500)" stroke-width="8" stroke-dasharray="339.292" stroke-dashoffset="0" id="lcm-timer-ring" style="transition: stroke-dashoffset 1s linear; transform: rotate(-90deg); transform-origin: 50% 50%;" />
+             </svg>
+             <div class="lcm-timer-text" id="lcm-timer-text">05:00</div>
+           </div>
+           <div class="lcm-timer-controls">
+             <button class="btn btn-sm btn-primary" id="lcm-timer-btn" onclick="toggleLcmTimer()">Start Timer</button>
+           </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lcm-footer">
+      <button class="btn btn-google" id="lcm-prev-btn" onclick="lcmPrev()">← Previous</button>
+      <button class="btn btn-primary" id="lcm-next-btn" onclick="lcmNext()">Next Step →</button>
+    </div>
+
+    <!-- Completion Screen -->
+    <div id="lcm-complete-screen" class="hidden">
+      <div style="font-size:5rem; margin-bottom:1rem; animation: slideUp 0.6s ease;">🎉</div>
+      <h2 style="font-size:2.5rem; margin-bottom:1rem; color:white; animation: slideUp 0.7s ease;">Cooking Complete!</h2>
+      <p style="font-size:1.2rem; color:rgba(255,255,255,0.8); margin-bottom:2rem; animation: slideUp 0.8s ease;">Bon Appétit! Enjoy your delicious meal.</p>
+      <button class="btn btn-primary" style="max-width:200px; animation: slideUp 0.9s ease;" onclick="exitLiveCooking()">Finish</button>
+    </div>
+  </div>
+
+  <!-- Scripts: dashboard.js already in head; load data → recipe logic -->
+  <script src="js/data.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/ar-engine.js"></script>
+  <script src="js/recipe.js"></script>
+  <script src="js/voice.js"></script>
+  <script>
+    // Random chef tip injection
+    const CHEF_TIPS = [
+      "Always taste as you cook and adjust salt before serving.",
+      "Let meat rest for 5 minutes after cooking to lock in juices.",
+      "Toast whole spices before grinding for deeper, richer flavour.",
+      "Use room-temperature ingredients for even cooking.",
+      "A splash of lemon juice at the end brightens any dish beautifully.",
+      "For stir-fries, use a very hot wok and keep ingredients moving.",
+      "Onions become sweeter the longer they caramelise — be patient!",
+      "Mise en place: prep all ingredients before you start cooking.",
+      "Rinse rice until water runs clear for fluffier grains.",
+      "Add a pinch of sugar to tomato-based sauces to balance acidity.",
+    ];
+    document.addEventListener('DOMContentLoaded', () => {
+      const tipEl = document.getElementById('r-tip');
+      if (tipEl) tipEl.textContent = CHEF_TIPS[Math.floor(Math.random() * CHEF_TIPS.length)];
+    });
+  </script>
+</body>
+</html>
